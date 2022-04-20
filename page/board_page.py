@@ -4,8 +4,21 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
 
+df = pd.DataFrame(data={'val': [10, 20, 30, 40],
+                        'names': ['1', '2', '3', '4']})
 
-fig = px.scatter(y=[10, 10, 10], x=[100, 200, 300], size=[40, 50, 10])
+fig = px.pie(df, values='val', names='names')
+
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
+fig.update_layout(
+    plot_bgcolor=colors['background'],
+    paper_bgcolor=colors['background'],
+    font_color=colors['text']
+)
+
 selector = dcc.Slider(
     id='first_figure_selector',
     min=0,
@@ -20,8 +33,13 @@ selector = dcc.Slider(
           Input('first_figure_selector', component_property='value'),
           suppress_callback_exceptions=True)
 def figure(size1):
-    size = [40*size1, 50*size1, 10+size1]
-    _fig = px.scatter(y=[10, 10, 10], x=[100, 200, 300], size=size)
+    df.loc[3, 'val'] = 40 + size1
+    _fig = px.pie(df, values='val', names='names')
+    _fig.update_layout(
+        plot_bgcolor=colors['background'],
+        paper_bgcolor=colors['background'],
+        font_color=colors['text']
+    )
     return _fig
 
 
