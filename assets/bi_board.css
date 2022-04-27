@@ -1,6 +1,32 @@
 .col{
-min-width: 0px;
+min-width: 300px;
 }
 
+.Select-control{
+background-color: black;
+border: black;
+}
 
+.is-open>.Select-control{
+background-color: black;
+}
 
+.is-focused{
+background-color: black;
+}
+
+.container{
+padding: 30px 0 30px;
+}
+
+.slider_group{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}
+
+.slider4{
+    height: 100% !important;
+    margin: 0 30px 0;
+}

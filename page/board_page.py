@@ -8,9 +8,14 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import joblib
 from page.element.model_for_ts import ONLY_PREDICTION_WITH_TRP
+import mysql.connector
 
-df1 = pd.read_csv('assets/board_pade/figure1.csv')
-df1.index = df1['area']
+
+# conn = mysql.connector.connect(host='192.168.0.195', user='toxa', password='password', database='BTC')
+
+
+#df1 = pd.read_csv('assets/board_pade/figure1.csv')
+df1 = pd.read_excel('assets/board_pade/figure1.xlsx')
 
 
 @callback(Output('first_figure', component_property='figure'),
@@ -18,9 +23,12 @@ df1.index = df1['area']
           suppress_callback_exceptions=True)
 def figure1(size1):
     global df1
-    df = df1.copy()
-    _fig = px.scatter(df.loc[size1], x='positive', y='negative', size='count', size_max=50,
-                      color='color', hover_name='area',
+    df = df1[df1['area'].isin(size1)].copy()
+    df['size'] = df[df.columns[1:]].sum(axis=1)
+    for i in df.columns[1:-1]:
+        df[i] = (df[i] / df['size']) * 100
+    _fig = px.scatter(df, x='positive', y='negative', size='size', size_max=50,
+                      color='area', hover_name='area',
                       hover_data={i: False for i in df.columns})
     _fig.update_layout(
         plot_bgcolor='#151515',
@@ -35,21 +43,40 @@ def figure1(size1):
     return _fig
 
 
-df2 = pd.read_csv('assets/board_pade/figure2.csv')
-
-
 @callback(Output('second_figure', component_property='figure'),
           Input('second_figure_selector', component_property='value'),
           suppress_callback_exceptions=True)
 def figure2(size1):
-    global df2
-    df: pd.DataFrame = df2[df2['area'].isin(size1)].copy()
+    _fig = px.scatter(x=[0, 1], y=[0, 1])
+    _fig.update_layout(
+        plot_bgcolor='#151515',
+        paper_bgcolor='black',
+        font_color='white',
+        xaxis={'showgrid': False,
+               'zeroline': False},
+        yaxis={'showgrid': False,
+               'zeroline': False},
+        showlegend=False,
+    )
+    return _fig
+
+
+# df3 = pd.read_csv('assets/board_pade/figure2.csv')
+df3 = pd.read_excel('assets/board_pade/figure2.xlsx')
+
+
+@callback(Output('third_figure', component_property='figure'),
+          Input('third_figure_selector', component_property='value'),
+          suppress_callback_exceptions=True)
+def figure3(size1):
+    global df3
+    df: pd.DataFrame = df3[df3['area'].isin(size1)].copy()
     df = df.groupby(by=['network']).sum()
-    df['size'] = df.sum(axis=1)
-    for i in df.columns[:-1]:
-        df[i] = (df[i] / df['size']) * 100
     df.reset_index(inplace=True)
-    _fig = px.scatter(df, x='positive', y='negative', size='size', size_max=50, hover_name='network',
+    df['size'] = df.sum(axis=1)
+    for i in df.columns[1:-1]:
+        df[i] = (df[i] / df['size']) * 100
+    _fig = px.scatter(df, x='positive', y='negative', size='size', size_max=70, hover_name='network',
                       hover_data={i: False for i in df.columns}, color='network')
     _fig.update_layout(
         plot_bgcolor='#151515',
@@ -64,10 +91,10 @@ def figure2(size1):
     return _fig
 
 
-@callback(Output('third_figure', component_property='figure'),
-          Input('third_figure_selector', component_property='value'),
+@callback(Output('fourth_figure', component_property='figure'),
+          Input('fourth_figure_selector', component_property='value'),
           suppress_callback_exceptions=True)
-def figure3(size1):
+def figure2(size1):
     global df1
     df = df1.copy()
     _fig = px.scatter(x=[0, 1], y=[0, 1])
@@ -87,13 +114,13 @@ def figure3(size1):
 model = ONLY_PREDICTION_WITH_TRP('assets/board_pade/model_for_figure4.pkl')
 
 
-@callback(Output('fourth_figure', component_property='figure'),
-          Input('fourth_figure_selector1', component_property='value'),
-          Input('fourth_figure_selector2', component_property='value'),
-          Input('fourth_figure_selector3', component_property='value'),
-          Input('fourth_figure_selector4', component_property='value'),
+@callback(Output('fifth_figure', component_property='figure'),
+          Input('fifth_figure_selector1', component_property='value'),
+          Input('fifth_figure_selector2', component_property='value'),
+          Input('fifth_figure_selector3', component_property='value'),
+          Input('fifth_figure_selector4', component_property='value'),
           suppress_callback_exceptions=True)
-def figure4(trp0, trp1, trp2, trp3):
+def figure5(trp0, trp1, trp2, trp3):
     global model
     df = pd.DataFrame({'pcs': model.pcs,
                        'x': list(range(model.pcs.shape[0])),
@@ -108,7 +135,6 @@ def figure4(trp0, trp1, trp2, trp3):
     df = df.append(pd.DataFrame({'pcs': model.prediction(trp_val),
                                  'x': list(range(model.pcs.shape[0] + 1, model.pcs.shape[0] + 53)),
                                  'color': 'predict_with_trp'}), ignore_index=True)
-    df.to_excel('check.xlsx')
     _fig = px.line(df, x='x', y='pcs', color='color')
     _fig.update_layout(
         plot_bgcolor='#151515',
@@ -127,11 +153,15 @@ layout = html.Div(id=ID, children=[
     html.Div(className='container-fluid page-content-element', children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
-                html.Div('PREDICTIVE ANALYSIS', className='title'),
-                html.Div('Thanks to modern algorithms, our team can predict various time series, for example, '
-                         'sales of your products.', className='first_text'),
-                html.Div('For a qualitative forecast, we study the influence of various factors such as: competitors, '
-                         'various marketing activities and others.', className='second_text')
+                html.Div('BRAND REPUTATION RESEARCH', className='title'),
+                html.Div('Инструмент, который позволяет в быстро меняющейся среде вовремя среагировать на возникающие '
+                         'угрозы в веб-пространстве. Благодаря мониторингу бренда в социальных сетях и медиа стало '
+                         'возможным отслежить, что говорят о продукте, выявить его слабые места и найти возможность '
+                         'улучшить продукт и мнение о нём.', className='first_text'),
+                html.Div('Люди легко переносят отношение к конкретному продукту на весь бренд, вовремя отрабатывать '
+                         'негатив - ключевой момент в работе над репутацией Тематика проблем меняется постоянно '
+                         'Non-stop анализ данных позволяет быть в курсе проблем и вовремя на них реагировать'
+                         , className='second_text')
             ]),
             html.Div(className='col', children=[
                 html.Img(src=f'assets/{ID}/banner.png', className='img_to_basic_stile_div')
@@ -174,80 +204,127 @@ layout = html.Div(id=ID, children=[
         ]),
     ]),
 
-    #  -------------------------------  first figure  --------------------------------
+    #  -------------------------------  first figure  --------------------------------  #
 
     html.Div(className='container', children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
                 'Исследования репутации бренда проводят в разных отрослях. '
-                'Больше всего негатива в отрасли табачных изделий, а позитива – в службе такси. '
-                '……….. '
+                'Самый большой уровень негатива у службы такси и у доставки еды, а самый низкий у крупной бытовой '
+                'технике и у самокатов. Чаще всего пользователи упоминают проблемы с тормозами и конфликты между '
+                'пешеходами и водителями самокатов. Основные всплески активности обсуждений – травматизм пешеходов '
+                'при участии самокатов. Среди исследованных категорий автомобилей доставка автомобилей имеет наибольшую '
+                'долю положительных упоминаний, а больше всего негатива — качество двигателей. Проблемы с двигателем '
+                'обсуждались в 3% всех упоминаний о неисправности, не так часто, как предполагалось. Основное количество '
+                'негативных отзывов связано с расходом топлива и масла, а также проблемами с клапанами и цилиндрами.'
             ]),
             html.Div(className='col', children=[
                 html.Div(dcc.Graph(id='first_figure')),
-                html.Div(dcc.Dropdown(df1.index,
-                                      df1.index,
+                html.Div(dcc.Dropdown(df1['area'],
+                                      df1['area'],
                                       multi=True, id='first_figure_selector'))
             ]),
         ])
     ]),
 
-    #  -------------------------------  second figure  --------------------------------
+    #  -------------------------------  second figure  --------------------------------  #
 
     html.Div(className='container', children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
                 html.Div(dcc.Graph(id='second_figure')),
-                html.Div(dcc.Dropdown(df2['area'].unique(),
-                                      df2['area'].unique(),
+                html.Div(dcc.Dropdown(['1'],
+                                      ['1'],
                                       multi=True, id='second_figure_selector'))
             ]),
             html.Div(className='col', children=[
-                'Основным каналом комуникации являються социальные сети, особенно Фейсбук. Поскольку '
-                'этот канал позволяет напрямую общаться бренду с его пользователями. +из през добавить'
+                'Для каждого бренда были выделины основные тематики обсуждений бренда в медиа. На основании '
+                'проведённых исследований было выявлено, что наиболее болезненными темами в автомобильной отрасли '
+                'являются проблемы с цилиндрами, расход масла, проблемы с клапанами, перегрев двигателя, проблемы с '
+                'рулевой рейкой, проблемы с коленвалом, проблемы с тормозами, проблемы с системой климат-контроля, '
+                'проблемы с ремнями безопасности, проблемы с кнопками управления. Негативные упоминания о телевизорах '
+                'обычно касаются качества экрана, программных ошибок и плохого комплекта оборудования. Покупателей '
+                'раздражает, когда сторонние продавцы часто меняют цены, особенно в период Черной пятницы. Также среди '
+                'наиболее обсуждаемых проблем крупной бытовой техники — отсутствие некоторых деталей / руководств '
+                'пользователя, программные ошибки и проблемная очистка'
             ]),
         ])
     ]),
 
-    #  -------------------------------  third figure  --------------------------------
+    #  -------------------------------  third figure  --------------------------------  #
 
     html.Div(className='container', children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
-                'На основании проведённых исследований составляется репутационный профиль бренда. '
-                'Основными блоками являются: Для автомобилей основным слабым местом являлись - , '
-                'для табачки - , а для бытовой техники - +++++++++++++'
+                'FACEBOOK - ИНИЦИАТОР ПОВОДОВ, СРАБАТЫВАЕТ КАК ТРИГГЕР ДЛЯ ИНФОРМАЦИОННОЙ ВОЛНЫ',
+                html.P(),
+                'Основным каналом комуникации являються социальные сети, особенно Фейсбук. Поскольку этот канал '
+                'позволяет напрямую общаться бренду с его пользователями. Социальные сети выступают в роли сервисных '
+                'центров, где пользователи сообщают о проблемах продукта. Также социальные сети часто имеют наибольшую '
+                'долю негатива. Для крупной бытовой техники онлайн-магазины также являются среди главных платформ. '
+                'Они, как правило, выступают в качестве места основного обсуждения преимуществ и недостатков продуктов, '
+                'опыта использования и т. д. Для автомобилей важным каналом коммуникаций также является youtube '
+                '(обзоры автомобилей, сравнение автомобилей, краш-тесты, руководства по техническому обслуживанию).'
             ]),
 
             html.Div(className='col', children=[
                 html.Div(dcc.Graph(id='third_figure')),
-                html.Div(dcc.Dropdown(df2['area'].unique(),
+                html.Div(dcc.Dropdown(df3['area'].unique(),
+                                      df3['area'].unique(),
                                       multi=True, id='third_figure_selector'))
             ]),
         ])
     ]),
 
-    #  -------------------------------  fourth figure  --------------------------------
-
+    #  -------------------------------  fourth figure  --------------------------------  #
     html.Div(className='container', children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
                 html.Div(dcc.Graph(id='fourth_figure')),
-                html.Div(className='col', children=[
-                    dcc.Slider(id='fourth_figure_selector1', vertical=True, min=0, max=500, step=1, value=0,
-                               marks={i: f'{i}' for i in range(0, 600, 100)}),
-                    dcc.Slider(id='fourth_figure_selector2', vertical=True, min=0, max=500, step=1, value=0,
-                               marks={i: f'{i}' for i in range(0, 600, 100)}),
-                    dcc.Slider(id='fourth_figure_selector3', vertical=True, min=0, max=500, step=1, value=0,
-                               marks={i: f'{i}' for i in range(0, 600, 100)}),
-                    dcc.Slider(id='fourth_figure_selector4', vertical=True, min=0, max=500, step=1, value=0,
-                               marks={i: f'{i}' for i in range(0, 600, 100)}),
-                ]),
+                html.Div(dcc.Dropdown(df1.index,
+                                      df1.index,
+                                      multi=True, id='fourth_figure_selector'))
             ]),
             html.Div(className='col', children=[
+                'На основании проведённых исследований составляется репутационный профиль бренда. Репутационный '
+                'профиль формируется на основе самых обсуждаемых тем в сети. Каждый имеет свой вес в общей оценке '
+                'уровня репутации бренда. Для крупной бытовой техники Performance имеет самый высокий рейтинг из-за '
+                'в основном положительных и нейтральных отзывов о продуктах на платформах электронной коммерции. '
+                'Категории «Инновации» и «Лидерство» самые низкие из-за большой доли нейтральных комментариев в '
+                'обзорах. Для телевизоров ситуация похожа с Performance, но самой низкой по своему характеру '
+                'является категория «Товары/Услуги» (обсуждения ремонтов, программных багов и т. д.). Для автомобилей '
+                'самый низкий уровень у категории «Инновации» из-за высокой конкуренции среди производителей '
+                'автомобилей, поэтому достаточно сложно выделиться инновационностю продукта. Для службы такси '
+                'слабым местом является «Место работы», поскольку тема кадровой политики имеет самый высокий '
+                'уровень негатива. '
+            ]),
+        ])
+    ]),
+
+    #  -------------------------------  fifth figure  --------------------------------  #
+
+    html.Div(className='container', children=[
+        html.Div(className='row', children=[
+            html.Div(className='col', children=[
                 'Большое влияние на продажи каждого бренда имеют рекламные активности в медиа. Основными каналами '
-                'по-прежнему остаются ТВ и Интернет. Благодаря проведённым исследованиям в фармацептической отрасли, '
-                'можем сказать, что наибольшое влияние имеет на аудиторию комуникация через ТВ.'
+                'по-прежнему остаются ТВ и Интернет. Благодаря проведённым исследованиям в фармацевтической отрасли, '
+                'можем сказать, что наибольшее влияние имеет на аудиторию коммуникация через ТВ. Так вы можете видеть '
+                'как ПРИМЕРНО может меняться уровень продаж от рекламной активности бренда на ТВ и в Интернете. Важно '
+                'отметить, что на практике для каждого бренда модель подбирается индивидуально в зависимости от доли '
+                'его на рынке, сезонности продукта, активности конкурентов и других имеющихся факторов.'
+            ]),
+            html.Div(className='col', children=[
+                html.Div(dcc.Graph(id='fifth_figure')),
+                html.Div(className='slider_group', children=[
+                    dcc.Slider(id='fifth_figure_selector1', vertical=True, min=0, max=500, step=1, value=0,
+                               className='slider4', marks={i: f'{i}' for i in range(0, 600, 100)}),
+                    dcc.Slider(id='fifth_figure_selector2', vertical=True, min=0, max=500, step=1, value=0,
+                               className='slider4', marks={i: f'{i}' for i in range(0, 600, 100)}),
+                    dcc.Slider(id='fifth_figure_selector3', vertical=True, min=0, max=500, step=1, value=0,
+                               className='slider4', marks={i: f'{i}' for i in range(0, 600, 100)}),
+                    dcc.Slider(id='fifth_figure_selector4', vertical=True, min=0, max=500, step=1, value=0,
+                               className='slider4', marks={i: f'{i}' for i in range(0, 600, 100)}),
+                ]),
             ]),
         ])
     ]),
