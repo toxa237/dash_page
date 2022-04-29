@@ -7,15 +7,26 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import joblib
+import pypyodbc
 from page.element.model_for_ts import ONLY_PREDICTION_WITH_TRP
-import mysql.connector
 
 
-# conn = mysql.connector.connect(host='192.168.0.195', user='toxa', password='password', database='BTC')
+conn = pypyodbc.connect('Driver={SQL SERVER};'
+'Server=UAIEV1SQLM01.emea.media.global.loc;'
+'Database=AmplifiDataDashboards;'
+'Trusted_Connection=yes;'
+'UID=AmplifiDataRobot;'
+'PWD=Straight6probably#;')
 
 
-#df1 = pd.read_csv('assets/board_pade/figure1.csv')
-df1 = pd.read_excel('assets/board_pade/figure1.xlsx')
+qwery1 = 'select * from industry'
+df1 = pd.read_sql(qwery1, conn)
+qwery2 = 'select * from category'
+df2 = pd.read_sql(qwery2, conn)
+qwery3 = 'select * from social_network'
+df3 = pd.read_sql(qwery3, conn)
+print('close')
+conn.close()
 
 
 @callback(Output('first_figure', component_property='figure'),
@@ -24,11 +35,11 @@ df1 = pd.read_excel('assets/board_pade/figure1.xlsx')
 def figure1(size1):
     global df1
     df = df1[df1['area'].isin(size1)].copy()
-    df['size'] = df[df.columns[1:]].sum(axis=1)
-    for i in df.columns[1:-1]:
+    df['size'] = df[df.columns[1:-1]].sum(axis=1)
+    for i in df.columns[1:-2]:
         df[i] = (df[i] / df['size']) * 100
     _fig = px.scatter(df, x='positive', y='negative', size='size', size_max=50,
-                      color='area', hover_name='area',
+                      color='area', hover_name='area', color_discrete_sequence=df['color'].values,
                       hover_data={i: False for i in df.columns})
     _fig.update_layout(
         plot_bgcolor='#151515',
@@ -47,7 +58,10 @@ def figure1(size1):
           Input('second_figure_selector', component_property='value'),
           suppress_callback_exceptions=True)
 def figure2(size1):
-    _fig = px.scatter(x=[0, 1], y=[0, 1])
+    global df2
+    df = df2[df2['area'] == size1].copy()
+    _fig = px.bar(df, y='categor', x=['negative', 'neutral', 'positive'], orientation='h',
+                  color_discrete_sequence=['#ED7D31', '#D9D9D9', '#27AB6C'])
     _fig.update_layout(
         plot_bgcolor='#151515',
         paper_bgcolor='black',
@@ -56,13 +70,9 @@ def figure2(size1):
                'zeroline': False},
         yaxis={'showgrid': False,
                'zeroline': False},
-        showlegend=False,
+        showlegend=False
     )
     return _fig
-
-
-# df3 = pd.read_csv('assets/board_pade/figure2.csv')
-df3 = pd.read_excel('assets/board_pade/figure2.xlsx')
 
 
 @callback(Output('third_figure', component_property='figure'),
@@ -73,7 +83,7 @@ def figure3(size1):
     df: pd.DataFrame = df3[df3['area'].isin(size1)].copy()
     df = df.groupby(by=['network']).sum()
     df.reset_index(inplace=True)
-    df['size'] = df.sum(axis=1)
+    df['size'] = df[df.columns[1:]].sum(axis=1)
     for i in df.columns[1:-1]:
         df[i] = (df[i] / df['size']) * 100
     _fig = px.scatter(df, x='positive', y='negative', size='size', size_max=70, hover_name='network',
@@ -94,7 +104,7 @@ def figure3(size1):
 @callback(Output('fourth_figure', component_property='figure'),
           Input('fourth_figure_selector', component_property='value'),
           suppress_callback_exceptions=True)
-def figure2(size1):
+def figure4(size1):
     global df1
     df = df1.copy()
     _fig = px.scatter(x=[0, 1], y=[0, 1])
@@ -233,9 +243,9 @@ layout = html.Div(id=ID, children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
                 html.Div(dcc.Graph(id='second_figure')),
-                html.Div(dcc.Dropdown(['1'],
-                                      ['1'],
-                                      multi=True, id='second_figure_selector'))
+                html.Div(dcc.Dropdown(df2['area'].unique(),
+                                      df2['area'].unique()[1],
+                                      id='second_figure_selector'))
             ]),
             html.Div(className='col', children=[
                 'Для каждого бренда были выделины основные тематики обсуждений бренда в медиа. На основании '
