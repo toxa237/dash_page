@@ -12,14 +12,14 @@ import numpy as np
 qwery = """SELECT pp.predicted_sentiment, pp.main_tag
 FROM philipmorris_predictions pp"""
 
-df = pd.read_excel('assets/board_pade/figure1.xlsx')
+df = pd.read_excel('assets/board_pade/figure4.xlsx')
 
 # cursor = conn.cursor()
 # conn.close()
 
 for i in range(df.shape[0]):
-    print(f'''INSERT INTO industry (area, negative, neutral, positive, color)
-    values ('{df.loc[i, 'area']}',{int(df.loc[i, 'negative'])}, {int(df.loc[i, 'neutral'])}, {int(df.loc[i, 'positive'])}, '{df.loc[i, 'color']}')''')
+    print(f'''INSERT INTO rep_profile (area, category, value)
+    values ('{df.loc[i, 'area']}', N'{df.loc[i, 'category']}', {int(df.loc[i, 'value'])})''')
 
 
 # conn.commit()

@@ -21,12 +21,18 @@ conn = pypyodbc.connect('Driver={SQL SERVER};'
 
 qwery1 = 'select * from industry'
 df1 = pd.read_sql(qwery1, conn)
+df1.drop(columns='id', inplace=True)
 qwery2 = 'select * from category'
 df2 = pd.read_sql(qwery2, conn)
+df2.drop(columns='id', inplace=True)
 qwery3 = 'select * from social_network'
 df3 = pd.read_sql(qwery3, conn)
-print('close')
+df3.drop(columns='id', inplace=True)
+qwery4 = 'select * from rep_profile'
+df4 = pd.read_sql(qwery4, conn)
+df4.drop(columns='id', inplace=True)
 conn.close()
+print('close')
 
 
 @callback(Output('first_figure', component_property='figure'),
@@ -61,7 +67,7 @@ def figure2(size1):
     global df2
     df = df2[df2['area'] == size1].copy()
     _fig = px.bar(df, y='categor', x=['negative', 'neutral', 'positive'], orientation='h',
-                  color_discrete_sequence=['#ED7D31', '#D9D9D9', '#27AB6C'])
+                  color_discrete_sequence=['#dd1a3a', '#638b8a', '#00cabe'])
     _fig.update_layout(
         plot_bgcolor='#151515',
         paper_bgcolor='black',
@@ -105,9 +111,14 @@ def figure3(size1):
           Input('fourth_figure_selector', component_property='value'),
           suppress_callback_exceptions=True)
 def figure4(size1):
-    global df1
-    df = df1.copy()
-    _fig = px.scatter(x=[0, 1], y=[0, 1])
+    global df4
+    df = df4[df4['area'] == size1].copy()
+
+    _fig = go.Figure(go.Sunburst(
+        labels=df['category'],
+        parents=[""]+['TOTAL']*(df.shape[0]-1),
+        values=df['value']
+    ))
     _fig.update_layout(
         plot_bgcolor='#151515',
         paper_bgcolor='black',
@@ -291,9 +302,9 @@ layout = html.Div(id=ID, children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
                 html.Div(dcc.Graph(id='fourth_figure')),
-                html.Div(dcc.Dropdown(df1.index,
-                                      df1.index,
-                                      multi=True, id='fourth_figure_selector'))
+                html.Div(dcc.Dropdown(df4['area'].unique(),
+                                      df4.loc[0, 'area'],
+                                      id='fourth_figure_selector'))
             ]),
             html.Div(className='col', children=[
                 'На основании проведённых исследований составляется репутационный профиль бренда. Репутационный '
