@@ -120,6 +120,7 @@ def figure4(size1):
         values=df['value']
     ))
     _fig.update_layout(
+        margin=dict(t=10, l=10, r=10, b=10),
         plot_bgcolor='#151515',
         paper_bgcolor='black',
         font_color='white',
@@ -175,14 +176,14 @@ layout = html.Div(id=ID, children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
                 html.Div('BRAND REPUTATION RESEARCH', className='title'),
-                html.Div('Инструмент, который позволяет в быстро меняющейся среде вовремя среагировать на возникающие '
-                         'угрозы в веб-пространстве. Благодаря мониторингу бренда в социальных сетях и медиа стало '
-                         'возможным отслежить, что говорят о продукте, выявить его слабые места и найти возможность '
-                         'улучшить продукт и мнение о нём.', className='first_text'),
-                html.Div('Люди легко переносят отношение к конкретному продукту на весь бренд, вовремя отрабатывать '
-                         'негатив - ключевой момент в работе над репутацией Тематика проблем меняется постоянно '
-                         'Non-stop анализ данных позволяет быть в курсе проблем и вовремя на них реагировать'
-                         , className='second_text')
+                html.Div('The tool allows you to react in time to emerging threats in the fast-changing web '
+                         'environment. By monitoring the brand on social media and social networks, it is possible to '
+                         'track what is being said about a product, identify its weaknesses and find opportunities to '
+                         'improve the product and opinions about it. People simply transfer their attitudes to a '
+                         'certain product to the whole brand, so dealing with negativity in a timely manner is a '
+                         'key moment in your reputational work. NON-STOP DATA ANALYSIS allows you to be aware of '
+                         'problems and react to them instantly, as the subject of problems changes all the time.',
+                         className='first_text')
             ]),
             html.Div(className='col', children=[
                 html.Img(src=f'assets/{ID}/banner.png', className='img_to_basic_stile_div')
@@ -230,14 +231,18 @@ layout = html.Div(id=ID, children=[
     html.Div(className='container', children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
-                'Исследования репутации бренда проводят в разных отрослях. '
-                'Самый большой уровень негатива у службы такси и у доставки еды, а самый низкий у крупной бытовой '
-                'технике и у самокатов. Чаще всего пользователи упоминают проблемы с тормозами и конфликты между '
-                'пешеходами и водителями самокатов. Основные всплески активности обсуждений – травматизм пешеходов '
-                'при участии самокатов. Среди исследованных категорий автомобилей доставка автомобилей имеет наибольшую '
-                'долю положительных упоминаний, а больше всего негатива — качество двигателей. Проблемы с двигателем '
-                'обсуждались в 3% всех упоминаний о неисправности, не так часто, как предполагалось. Основное количество '
-                'негативных отзывов связано с расходом топлива и масла, а также проблемами с клапанами и цилиндрами.'
+                html.Div(className='smol_title', children='BRANCHES'),
+                'Brand reputation is the consumers’ perception of a particular brand, product, or service. Therefore, '
+                'its research is important in all industries without exception. Based on results from industries such '
+                'as tobacco, gaming, taxi service, automotive, large home appliances, and logistics, we can conclude '
+                'that taxi service and food delivery have the highest level of negativity, while large home '
+                'appliances and scooters have the lowest. The analysis shows that the main accidental discussions '
+                'about scooters are pedestrian injuries when scooters are involved. Users say they are most concerned '
+                'about the brakes and conflicts between pedestrians and scooter drivers. Regarding cars, it’s '
+                'important to highlight that among the categories surveyed, delivery has the highest rate of '
+                'positive mentions, and engine quality is the negative one. Meanwhile, engine problems were '
+                'discussed in 3% of all faulty mentions — not as often as basically thought. The fuel and oil '
+                'consumption, as well as valve and cylinder problems, described the main number of negative mentions.'
             ]),
             html.Div(className='col', children=[
                 html.Div(dcc.Graph(id='first_figure')),
@@ -259,15 +264,16 @@ layout = html.Div(id=ID, children=[
                                       id='second_figure_selector'))
             ]),
             html.Div(className='col', children=[
-                'Для каждого бренда были выделины основные тематики обсуждений бренда в медиа. На основании '
-                'проведённых исследований было выявлено, что наиболее болезненными темами в автомобильной отрасли '
-                'являются проблемы с цилиндрами, расход масла, проблемы с клапанами, перегрев двигателя, проблемы с '
-                'рулевой рейкой, проблемы с коленвалом, проблемы с тормозами, проблемы с системой климат-контроля, '
-                'проблемы с ремнями безопасности, проблемы с кнопками управления. Негативные упоминания о телевизорах '
-                'обычно касаются качества экрана, программных ошибок и плохого комплекта оборудования. Покупателей '
-                'раздражает, когда сторонние продавцы часто меняют цены, особенно в период Черной пятницы. Также среди '
-                'наиболее обсуждаемых проблем крупной бытовой техники — отсутствие некоторых деталей / руководств '
-                'пользователя, программные ошибки и проблемная очистка'
+                html.Div(className='smol_title', children='CATEGORIES'),
+                'In brand research, the important step is to identify the key themes consumers are talking about. It '
+                'allows the problem areas of a product or service to be explored in more detail. For example, based '
+                'on the research conducted, we found that the most troublesome topics in the automotive industry are '
+                'cylinder problems, high oil consumption, valves, engine overheating, steering rack, crankshaft, '
+                'brakes, climate control, seat belts and control buttons. As for TVs, the top negative mentions '
+                'frequently relate to screen quality, programming errors and bad set of equipment. Customers annoy '
+                'when third-party sellers change prices again and again, especially during Black Friday. The lack of '
+                'some parts / user manuals, software bugs and problematic cleaning are as well among the most '
+                'discussed problems of large home appliances.'
             ]),
         ])
     ]),
@@ -277,15 +283,16 @@ layout = html.Div(id=ID, children=[
     html.Div(className='container', children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
-                'FACEBOOK - ИНИЦИАТОР ПОВОДОВ, СРАБАТЫВАЕТ КАК ТРИГГЕР ДЛЯ ИНФОРМАЦИОННОЙ ВОЛНЫ',
+                html.Div(className='smol_title', children='SOCIAL MEDIA'),
+                'FACEBOOK IS THE INITIATOR OF THE OCCASIONS, TRIGGER OF THE INFORMATION WAVE.',
                 html.P(),
-                'Основным каналом комуникации являються социальные сети, особенно Фейсбук. Поскольку этот канал '
-                'позволяет напрямую общаться бренду с его пользователями. Социальные сети выступают в роли сервисных '
-                'центров, где пользователи сообщают о проблемах продукта. Также социальные сети часто имеют наибольшую '
-                'долю негатива. Для крупной бытовой техники онлайн-магазины также являются среди главных платформ. '
-                'Они, как правило, выступают в качестве места основного обсуждения преимуществ и недостатков продуктов, '
-                'опыта использования и т. д. Для автомобилей важным каналом коммуникаций также является youtube '
-                '(обзоры автомобилей, сравнение автомобилей, краш-тесты, руководства по техническому обслуживанию).'
+                'The primary communication channel is social media, and Facebook in particular. This channel allows a '
+                'brand to communicate with their users personally. Social networks are the service centers where users '
+                'signal product problems. It often has the largest share of negativity. One of the main platforms for '
+                'large home appliances is also online retailers, for example. They go to act as a venue for a basic '
+                'discussion of the advantages and disadvantages of products, user experiences, etc. As for cars, '
+                'YouTube is another important communication channel, where car reviews, comparisons, crash tests, and '
+                'maintenance manuals are published mainly. '
             ]),
 
             html.Div(className='col', children=[
@@ -307,17 +314,17 @@ layout = html.Div(id=ID, children=[
                                       id='fourth_figure_selector'))
             ]),
             html.Div(className='col', children=[
-                'На основании проведённых исследований составляется репутационный профиль бренда. Репутационный '
-                'профиль формируется на основе самых обсуждаемых тем в сети. Каждый имеет свой вес в общей оценке '
-                'уровня репутации бренда. Для крупной бытовой техники Performance имеет самый высокий рейтинг из-за '
-                'в основном положительных и нейтральных отзывов о продуктах на платформах электронной коммерции. '
-                'Категории «Инновации» и «Лидерство» самые низкие из-за большой доли нейтральных комментариев в '
-                'обзорах. Для телевизоров ситуация похожа с Performance, но самой низкой по своему характеру '
-                'является категория «Товары/Услуги» (обсуждения ремонтов, программных багов и т. д.). Для автомобилей '
-                'самый низкий уровень у категории «Инновации» из-за высокой конкуренции среди производителей '
-                'автомобилей, поэтому достаточно сложно выделиться инновационностю продукта. Для службы такси '
-                'слабым местом является «Место работы», поскольку тема кадровой политики имеет самый высокий '
-                'уровень негатива. '
+                html.Div(className='smol_title', children='REPUTATION PROFILE'),
+                'A brand reputation profile based on the research — what is being said about the brand, what are the '
+                'most vulnerable areas of the product and identified its key problems. In other words, we form a '
+                'reputation profile based on the most discussed topics online, and each topic has its own weight in '
+                'the overall assessment of the brand’s reputation. For example, as for large appliances and TVs, '
+                '“Performance” has the highest score, mainly because of the positive and neutral product reviews on '
+                'e-commerce platforms. The lowest category for TVs is “Products/Services” (discussions of repairs, '
+                'software bugs, etc.). The lowest score for cars is found in the Innovation category because of top '
+                'competition among manufacturers. Thus, it is quite difficult to stand out with product innovation. '
+                'As for the taxi service, “Place of work” is the weakest point, as personnel policy has the highest '
+                'level of negativity.'
             ]),
         ])
     ]),
@@ -327,12 +334,14 @@ layout = html.Div(id=ID, children=[
     html.Div(className='container', children=[
         html.Div(className='row', children=[
             html.Div(className='col', children=[
-                'Большое влияние на продажи каждого бренда имеют рекламные активности в медиа. Основными каналами '
-                'по-прежнему остаются ТВ и Интернет. Благодаря проведённым исследованиям в фармацевтической отрасли, '
-                'можем сказать, что наибольшее влияние имеет на аудиторию коммуникация через ТВ. Так вы можете видеть '
-                'как ПРИМЕРНО может меняться уровень продаж от рекламной активности бренда на ТВ и в Интернете. Важно '
-                'отметить, что на практике для каждого бренда модель подбирается индивидуально в зависимости от доли '
-                'его на рынке, сезонности продукта, активности конкурентов и других имеющихся факторов.'
+                html.Div(className='smol_title', children='SALES'),
+                'The key indicator of a user’s attitude to a product is the level of its sales. Media advertising '
+                'activity has a major impact on sales for each brand. TV and the Internet are still the main channels. '
+                'Research in the pharmaceutical industry shows that communication via TV has the greatest influence '
+                'on the audience. So, you can see how the change in sales levels difference between the brand’s '
+                'advertising activity on TV and the Internet. It’s important to highlight that we customize the model '
+                'for each brand depending on its market share, product seasonality, competitor activity and other '
+                'factors.'
             ]),
             html.Div(className='col', children=[
                 html.Div(dcc.Graph(id='fifth_figure')),
